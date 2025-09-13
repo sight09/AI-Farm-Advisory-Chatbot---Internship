@@ -1,38 +1,102 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-from app.core.gemini_client import embed_texts, generate_answer
-from app.core.retrieval_service import retrieve_top_k
+from typing import Optional, List
+from sqlalchemy import select
 
+from services.db.scripts.db import async_session
+from services.db.scripts.schema import Document
+from app.core.openai_client import embed_texts, chat_completion, translate
 router = APIRouter()
 
+
+# ---- Request & Response Models ----
 class AskRequest(BaseModel):
     question: str
-    lang: str = "auto"  # optional
+    lang: Optional[str] = "en"   # "en", "am" (Amharic), "om" (Afan Oromo)
+
+
+class SourceDoc(BaseModel):
+    id: int
+    title: Optional[str]
+    snippet: str
+    metadata: Optional[dict]
+
 
 class AskResponse(BaseModel):
     answer: str
-    sources: list
+    sources: List[SourceDoc] = []
 
+
+# ---- Endpoint ----
 @router.post("/ask", response_model=AskResponse)
-def ask(req: AskRequest):
-    # 1) Translate to English using Gemini (if needed)
-    translation_prompt = f"Translate to English only (no extra text):\n\n{req.question}"
-    english_question = generate_answer(translation_prompt)
+async def ask(req: AskRequest):
+    """
+    Handles farmer questions:
+    - Translates to English (if needed)
+    - Embeds the query
+    - Searches pgvector for relevant docs
+    - Feeds context + question to OpenAI
+    - Translates back to original language (if not English)
+    """
 
-    # 2) Embed the question
-    q_emb = embed_texts([english_question])[0]
+    # 1) Translate to English if needed
+    original_lang = req.lang or "en"
+    if original_lang != "en":
+        q_en = await translate(req.question, "English")
+    else:
+        q_en = req.question
 
-    # 3) Retrieve relevant chunks
-    hits = retrieve_top_k(q_emb, k=5)
-    context = "\n\n---\n\n".join(h["chunk"] for h in hits)
+    # 2) Embed query
+    q_emb = (await embed_texts([q_en]))[0]
 
-    # 4) Build prompt for answer
-    system = (
-        "You are an agricultural assistant. Use ONLY the provided context to answer the question in clear simple English. "
-        "If answer not in context, be honest and say you don't know."
+    # 3) Vector search in pgvector (top 5)
+    async with async_session() as session:
+        stmt = (
+            select(Document)
+            .order_by(Document.embedding.cosine_distance(q_emb))
+            .limit(5)
+        )
+        res = await session.execute(stmt)
+        docs = res.scalars().all()
+
+    # 4) Build context
+    context = "\n\n---\n\n".join(
+        f"Source({d.id}): {d.content[:1000]}" for d in docs
     )
-    prompt = system + "\n\nCONTEXT:\n" + context + "\n\nQUESTION:\n" + english_question + "\n\nAnswer succinctly:"
 
-    # 5) Generate answer with Gemini
-    ans = generate_answer(prompt)
-    return {"answer": ans, "sources": [h["id"] for h in hits]}
+    system_prompt = (
+        "You are an agricultural advisor for smallholder farmers. "
+        "Answer concisely, practically, and with actionable steps."
+    )
+
+    messages = [
+        {
+            "role": "user",
+            "content": f"Question: {q_en}\n\nContext:\n{context}\n\n"
+                       "Answer in English with practical advice."
+        }
+    ]
+
+    # 5) Call OpenAI
+    answer_en = await chat_completion(system_prompt, messages, max_tokens=512)
+
+    # 6) Translate back if needed
+    if original_lang != "en":
+        target_lang = {"am": "Amharic", "om": "Afan Oromo"}.get(original_lang, "English")
+        answer_out = await translate(answer_en, target_lang)
+    else:
+        answer_out = answer_en
+
+    # 7) Return structured response
+    return AskResponse(
+        answer=answer_out,
+        sources=[
+            SourceDoc(
+                id=d.id,
+                title=d.title,
+                snippet=(d.content[:300] + "..."),
+                metadata=d.metadata,
+            )
+            for d in docs
+        ],
+    )
