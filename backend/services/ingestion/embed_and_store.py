@@ -1,5 +1,7 @@
 import asyncio
 import os
+from sqlalchemy import String
+from sqlalchemy.dialects.postgresql import JSON
 from common.config import settings
 from common.models.db import SessionLocal
 from common.models.document import Document
@@ -15,8 +17,18 @@ async def embed_and_store(file_path: str, title: str = None):
     
     try:
         text = document_reader(file_path)
+        
         if not text:
             print(f"Failed to read or empty content from '{file_path}'.")
+            return
+        
+        filename_with_extension = os.path.basename(file_path)
+        
+        # check if document embedded previously
+        existing_doc = db.query(Document).filter(Document.src_file_name == filename_with_extension).first()
+        
+        if existing_doc:
+            print(f"Document '{file_path}' already embedded. Skipping.")
             return
         
         chunks = chunk_text(text)
@@ -36,11 +48,12 @@ async def embed_and_store(file_path: str, title: str = None):
                 title=title or os.path.basename(file_path),
                 content=chunk,
                 doc_metadata={"source": file_path},
+                src_file_name=filename_with_extension,
                 embedding=embedding
             )
             db.add(doc)
         
-        await db.commit()
+        db.commit()
         
         print(f"Committed {len(chunks)} chunks for {file_path}")
     finally:
