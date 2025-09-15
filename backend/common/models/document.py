@@ -11,6 +11,7 @@ class Document(Base):
     title = Column(Text, nullable=True)
     content = Column(Text, nullable=False)
     doc_metadata = Column(JSON, nullable=True)
+    src_file_name = Column(Text, nullable=False)
     # EMBED_DIM is read from config at runtime when creating table
     embedding = Column(Vector(int(settings.embed_dim)), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
