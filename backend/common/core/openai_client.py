@@ -20,6 +20,17 @@ async def embed_texts(texts: list[str]) -> list[list[float]]:
     return embeddings
 
 
+async def single_embed(text: str) -> list[float]:
+    """
+    Generate embedding for a given text.
+    """
+    response = openai_client.embeddings.create(
+        model=settings.embedding_model,
+        input=text
+    )
+    return response.data[0].embedding
+
+
 async def chat_completion(system_prompt: str, messages: list[dict], max_tokens=512):
     """
     Generate a chat completion using the OpenAI chat model.
