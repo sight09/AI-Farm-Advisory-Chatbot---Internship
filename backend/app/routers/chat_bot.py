@@ -15,6 +15,14 @@ class AskRequest(BaseModel):
 class AskResponse(BaseModel):
     answer: str
     sources: list
+    
+lang_map = {
+    "auto": "English",
+    "en": "English",
+    "am": "Amharic",
+    "om": "Affan Oromo",
+    "so": "Somali"
+}
 
 @router.post("/ask", response_model=AskResponse)
 async def ask_question(request: AskRequest, db: Session = Depends(get_db)):
@@ -44,6 +52,7 @@ async def ask_question(request: AskRequest, db: Session = Depends(get_db)):
     system = (
         "You are an agricultural assistant. Use ONLY the provided context to answer the question in clear simple English. "
         "If answer not in context, be honest and say you don't know."
+        f"Answer must be in {lang_map[request.lang]} language."
     )
     
     prompt = f"""Use the following context to answer the
