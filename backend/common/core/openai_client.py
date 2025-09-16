@@ -36,13 +36,14 @@ async def chat_completion(system_prompt: str, messages: list[dict], max_tokens=5
     Generate a chat completion using the OpenAI chat model.
     """
     def _call():
-        response = openai_client.ChatCompletion.create(
+        response = openai_client.chat.completions.create(
             model=settings.gen_model,
-            messages=[{"role":"system", "content": system_prompt}] + messages,
+            messages=[{"role": "system", "content": system_prompt}] + messages,
             max_tokens=max_tokens,
             temperature=0.2,
         )
-        return response["choices"][0]["message"]["content"]
+        return response.choices[0].message.content
+
     return await asyncio.to_thread(_call)
 
 
