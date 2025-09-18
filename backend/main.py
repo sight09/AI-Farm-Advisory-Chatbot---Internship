@@ -70,6 +70,14 @@ def embed_and_store_cmd(file_path, title):
     asyncio.run(run_embed_and_store())
 
 
+@cli.command(help="Run the Telegram bot.")
+def runbot():
+    from services.bot.handlers.bot import init_bot
+    init_bot()
+
+    
+
+
 if __name__ == "__main__":
     try:
         cli()
