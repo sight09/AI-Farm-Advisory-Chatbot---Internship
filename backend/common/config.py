@@ -3,6 +3,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict # type: ignore
 class Settings(BaseSettings):
     openai_api_key: str = ""
     openweather_api_key: str = ""
+    telegram_bot_token: str = ""
     gen_model: str = "gpt-4o-mini"
     embedding_model: str = "text-embedding-3-small"
     embed_dim: int = 1536
