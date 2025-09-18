@@ -76,10 +76,10 @@ async def ask_question(request: AskRequest, db: Session = Depends(get_db)):
 
     answer = await chat_completion(system, [{"role":"user","content":prompt}], max_tokens=512)
     
-    print("Question:", request.question)
-    print("Context:", context)
-    print("Weather info:", weather_data)
-    print("Answer:", answer)
+    # print("Question:", request.question)
+    # print("Context:", context)
+    # print("Weather info:", weather_data)
+    # print("Answer:", answer)
 
     sources = ["source1", "source2"]
     return AskResponse(answer=answer, sources=sources)
