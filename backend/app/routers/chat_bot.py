@@ -5,12 +5,14 @@ from common.models.db import get_db
 from common.models.document import Document
 from common.config import settings
 from common.core.openai_client import translate, single_embed, chat_completion
+from common.core.openweather import get_weather
 
 router = APIRouter()
 
 class AskRequest(BaseModel):
     question: str = Field(..., min_length=10, max_length=200, example="What is the best fertilizer for tomatoes?")
     lang: str = Field("auto", pattern="^(auto|en|am|om|so)$")  # optional
+    location: str = Field(None, example="Addis Ababa")  # optional
 
 class AskResponse(BaseModel):
     answer: str
@@ -47,12 +49,16 @@ async def ask_question(request: AskRequest, db: Session = Depends(get_db)):
     context = "\n\n".join([doc.content for doc in result])
     if not context.strip():
         return AskResponse(answer="I'm sorry, I don't have enough information to answer that question.", sources=[])
-    
+
+    # if request.location:
+    #     weather_data = await get_weather(request.location)
+    #     context += f"\n\nWeather information for {request.location}:\n{weather_data}"
+
     # Build prompt for answering
     system = (
         "You are an agricultural assistant. Use ONLY the provided context to answer the question in clear simple English. "
         "If answer not in context, be honest and say you don't know."
-        f"Answer must be in {lang_map[request.lang]} language."
+        f"Answer must be in {lang_map[request.lang]} language only don't include any other language."
     )
     
     prompt = f"""Use the following context to answer the
