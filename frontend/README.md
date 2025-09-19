@@ -1,73 +1,155 @@
-# Welcome to your Lovable project
+# AI Farm Advisory Chatbot - Frontend
 
-## Project info
+A beautiful, modern React frontend for the AI Farm Advisory Chatbot with multilingual support and responsive design.
 
-**URL**: https://lovable.dev/projects/15b28f2f-0b11-4826-af11-11e308588f41
+## 🌱 Features
 
-## How can I edit this code?
+- **Modern Chat Interface**: Clean, agricultural-themed design with user and bot message bubbles
+- **Multilingual Support**: English, Amharic, Affan Oromo, and Somali
+- **Real-time Responses**: Connects to FastAPI backend for intelligent farming advice
+- **Source Display**: Shows sources for AI responses to ensure transparency
+- **Responsive Design**: Works perfectly on desktop, tablet, and mobile
+- **Loading States**: Beautiful loading indicators and smooth animations
+- **Error Handling**: Graceful error handling with user-friendly messages
 
-There are several ways of editing your application.
+## 🚀 Quick Start
 
-**Use Lovable**
+### Prerequisites
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/15b28f2f-0b11-4826-af11-11e308588f41) and start prompting.
+- Node.js 18+ and npm
+- Your FastAPI backend running on `http://localhost:8000`
 
-Changes made via Lovable will be committed automatically to this repo.
+### Installation & Running
 
-**Use your preferred IDE**
+1. **Clone and Install Dependencies**
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+   ```bash
+   npm install
+   ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+2. **Start the Development Server**
 
-Follow these steps:
+   ```bash
+   npm run dev
+   ```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+3. **Open Your Browser**
+   - Navigate to `http://localhost:8080`
+   - The frontend will automatically connect to your backend at `localhost:8000`
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## 🔧 Backend Connection
 
-# Step 3: Install the necessary dependencies.
-npm i
+The frontend expects your FastAPI backend to be running on `http://localhost:8000` with these endpoints:
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+- `POST /ask` - Send agricultural questions
+  ```json
+  {
+    "question": "How do I improve soil fertility?",
+    "lang": "en"
+  }
+  ```
+- `POST /embed` - Upload PDF documents (optional, feature currently disabled in UI)
+  ```
+  FormData with 'file' field containing PDF
+  ```
+
+### Starting Your Backend
+
+Make sure your FastAPI backend is running:
+
+```bash
+cd backend
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-**Edit a file directly in GitHub**
+## 🎨 Design Features
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- **Agricultural Color Scheme**: Earthy greens and natural tones
+- **Smooth Animations**: Loading states and message transitions
+- **Responsive Layout**: Mobile-first design with touch-friendly inputs
+- **Accessibility**: Proper ARIA labels and keyboard navigation
+- **Modern UI Components**: Built with shadcn/ui and Tailwind CSS
+- **Custom Logo**: Nile Tech Solutions logo used in header and meta tags
 
-**Use GitHub Codespaces**
+## 📱 Mobile Support
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+The chatbot is fully responsive and optimized for:
 
-## What technologies are used for this project?
+- Mobile phones (portrait and landscape)
+- Tablets
+- Desktop computers
+- Touch and keyboard interactions
 
-This project is built with:
+## 🔍 Usage Tips
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+1. **Ask Specific Questions**: "How do I treat wheat rust disease?"
+2. **Use Natural Language**: The AI understands conversational queries
+3. **Switch Languages**: Use the language selector in the header
+4. **Check Sources**: Review the sources provided with each answer
 
-## How can I deploy this project?
+## 🏗️ Technical Stack
 
-Simply open [Lovable](https://lovable.dev/projects/15b28f2f-0b11-4826-af11-11e308588f41) and click on Share -> Publish.
+- **React 18** with TypeScript
+- **Tailwind CSS** for styling
+- **shadcn/ui** component library
+- **Lucide React** for icons
+- **Vite** for build and development
+- **React Query** for data fetching
 
-## Can I connect a custom domain to my Lovable project?
+## 🛠️ Development
 
-Yes, you can!
+### File Structure
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+```
+src/
+├── components/         # Reusable UI components
+│   ├── ChatHeader.tsx     # Header with language selector and logo
+│   ├── ChatMessage.tsx    # Message bubble component
+│   ├── ChatInput.tsx      # Input field and send button
+│   └── LoadingIndicator.tsx # Loading animation
+├── services/          # API service layer
+│   └── api.ts            # Backend communication
+├── pages/            # Main pages
+│   ├── Landing.tsx       # Landing page
+│   ├── Chat.tsx          # Chat interface
+│   └── NotFound.tsx      # 404 page
+├── contexts/         # React context providers
+│   └── LanguageContext.tsx # Language context
+└── index.css         # Global styles and design system
+```
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### Customization
+
+- **Colors**: Edit `src/index.css` for theme colors
+- **API URL**: Update `API_BASE_URL` in `src/services/api.ts`
+- **Languages**: Modify `languages` array in `src/services/api.ts`
+- **Logo**: Replace `/public/nile-tech-logo.png` for branding
+
+## 🐛 Troubleshooting
+
+### Backend Connection Issues
+
+If you see "Failed to get response from the server":
+
+1. Verify backend is running: `curl http://localhost:8000/docs`
+2. Check console for CORS errors
+3. Ensure backend allows `localhost:8080` origin
+
+### Common Issues
+
+- **Build Errors**: Run `npm install` to ensure all dependencies
+- **Port Conflicts**: Backend must use port 8000, frontend uses 8080
+- **Language Issues**: Check that your backend supports all language codes
+- **Router Errors**: Only one `<BrowserRouter>` should exist (see `App.tsx`)
+
+## 📝 API Integration
+
+The frontend automatically handles:
+
+- Message formatting and validation
+- Loading states during API calls
+- Error recovery and user notification
+- Source display from backend responses
+- (PDF upload temporarily disabled in UI)
+
+Perfect for agricultural consultants, farmers, and anyone needing intelligent farming advice! 🌾
