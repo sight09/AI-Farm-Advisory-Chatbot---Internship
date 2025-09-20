@@ -4,16 +4,23 @@ from common.config import settings
 
 BASE_URL = "http://api.openweathermap.org/data/2.5/weather"
 
-async def get_weather(city: str, units: str = "metric", lang: str = "en") -> dict:
+async def get_weather(city: str = None, units: str = "metric", lang: str = "en", lat: float = None, lon: float = None) -> dict:
     """
     Fetch current weather data for a city from OpenWeatherMap.
     """
+
     params = {
-        "q": city,
         "appid": settings.openweather_api_key,
         "units": units,  # "metric" (°C), "imperial" (°F)
         "lang": lang     # response language
     }
+
+    if city:
+        params["q"] = city
+    else:
+        params["lat"] = lat
+        params["lon"] = lon
+    
 
     async with httpx.AsyncClient(timeout=10.0) as client:
         response = await client.get(BASE_URL, params=params)
@@ -25,7 +32,7 @@ async def get_weather(city: str, units: str = "metric", lang: str = "en") -> dic
 
 def generate_weather_paragraph(weather_data):
     # Extracting data
-    city = weather_data['name']
+    city = weather_data['name'] or "Your location"
     country = weather_data['sys']['country']
     temperature = weather_data['main']['temp']
     feels_like = weather_data['main']['feels_like']
