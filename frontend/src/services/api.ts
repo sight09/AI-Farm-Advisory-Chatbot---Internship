@@ -20,7 +20,7 @@ export interface ChatRequest {
 
 export const languages = [
   { code: "en", name: "English" },
-  { code: "or", name: "Affan Oromo" },
+  { code: "om", name: "Affan Oromo" },
   { code: "am", name: "Amharic" },
   { code: "ti", name: "Tigrigna" },
   { code: "so", name: "Somali" },
@@ -36,7 +36,7 @@ export async function sendMessage(
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ question, lang }),
+      body: JSON.stringify({ question, lang, location: "Dessie" }),
     });
 
     if (!response.ok) {
