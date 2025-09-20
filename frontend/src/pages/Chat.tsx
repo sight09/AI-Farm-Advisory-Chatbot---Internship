@@ -14,6 +14,7 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const { currentLanguage, changeLanguage } = useLanguage();
+  const [location, setLocation] = useState<{ latitude: number; longitude: number; errorMessage: string } | null>(null);
   const { t } = useTranslations();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -22,7 +23,34 @@ const Index = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const getLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          console.log("Latitude: " + position.coords.latitude + ", Longitude: " + position.coords.longitude);
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            errorMessage: "",
+          });
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          setLocation((prev) => ({
+            ...prev,
+            errorMessage: "Unable to retrieve location",
+          }));
+        }
+      );
+    } else {
+      setLocation({ latitude: 0, longitude: 0, errorMessage: "Geolocation is not supported by this browser" });
+      console.error("Geolocation is not supported by this browser.");
+    }
+  };
+
+
   useEffect(() => {
+    getLocation();
     scrollToBottom();
   }, [messages, isLoading]);
 
@@ -38,7 +66,13 @@ const Index = () => {
     setIsLoading(true);
 
     try {
-      const response = await sendMessage(messageText, currentLanguage);
+      const response = await sendMessage(
+        messageText,
+        currentLanguage,
+        location ? "" : null,
+        location ? location.latitude : null,
+        location ? location.longitude : null
+      );
       
       const botMessage: ChatMessageType = {
         id: (Date.now() + 1).toString(),

@@ -16,6 +16,9 @@ export interface ChatResponse {
 export interface ChatRequest {
   question: string;
   lang: string;
+  location: string;
+  latitude: number;
+  longitude: number;
 }
 
 export const languages = [
@@ -28,7 +31,10 @@ export const languages = [
 
 export async function sendMessage(
   question: string,
-  lang: string
+  lang: string,
+  location: string = null,
+  latitude: number = null,
+  longitude: number = null
 ): Promise<ChatResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/ask`, {
@@ -36,7 +42,7 @@ export async function sendMessage(
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ question, lang, location: "Dessie" }),
+      body: JSON.stringify({ question, lang, location: location, latitude: latitude, longitude: longitude }),
     });
 
     if (!response.ok) {
