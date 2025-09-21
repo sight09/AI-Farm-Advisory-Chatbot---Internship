@@ -51,7 +51,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
         
         <div className={`flex items-center mt-1 sm:mt-2 text-xs text-muted-foreground ${isUser ? 'justify-end' : ''}`}>
           <Clock className="h-3 w-3 mr-1" />
-          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </div>
       </div>
     </div>
