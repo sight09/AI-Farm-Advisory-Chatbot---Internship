@@ -8,9 +8,11 @@ import { sendMessage, uploadDocument, ChatMessage as ChatMessageType } from "@/s
 import { Sprout, MessageCircle } from "lucide-react";
 import { useTranslations } from "@/hooks/useTranslations";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useChat } from "@/contexts/ChatContext";
 
 const Index = () => {
-  const [messages, setMessages] = useState<ChatMessageType[]>([]);
+  // const [messages, setMessages] = useState<ChatMessageType[]>([]);
+  const { messages, addMessage } = useChat();
   const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const { currentLanguage, changeLanguage } = useLanguage();
@@ -62,7 +64,8 @@ const Index = () => {
       timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    // setMessages(prev => [...prev, userMessage]);
+    addMessage(userMessage);
     setIsLoading(true);
 
     try {
@@ -82,7 +85,8 @@ const Index = () => {
         sources: response.sources,
       };
 
-      setMessages(prev => [...prev, botMessage]);
+      // setMessages(prev => [...prev, botMessage]);
+      addMessage(botMessage);
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
@@ -98,7 +102,8 @@ const Index = () => {
         timestamp: new Date(),
       };
       
-      setMessages(prev => [...prev, errorMessage]);
+      // setMessages(prev => [...prev, errorMessage]);
+      addMessage(errorMessage);
     } finally {
       setIsLoading(false);
     }
