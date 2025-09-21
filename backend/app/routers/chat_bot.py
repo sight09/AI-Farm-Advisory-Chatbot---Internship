@@ -87,6 +87,9 @@ async def ask_question(request: AskRequest, db: Session = Depends(get_db)):
         "- **Consistency & Transparency**: If you're unsure about something, communicate that clearly and refrain from guessing. "
         "Always prioritize honesty in your responses.\n\n"
         
+        "If the user greets you (e.g., 'Hi', 'Hello', 'Good morning'), respond in a friendly, human-like manner, such as:\n"
+        "'Hello! How can I assist you with your farming needs today?' or 'Hi there! How can I help with your agricultural questions?'"
+
         f"Answer must be in {lang_map[request.lang]} language only. Don't include any other language.\n\n"
         
         # Add a response for identifying the assistant
