@@ -17,7 +17,6 @@ class Settings(BaseSettings):
         extra="ignore"
     )
     supported_languages: dict = {
-        "auto": "English",
         "en": "English",
         "am": "Amharic",
         "om": "Affan Oromo",
