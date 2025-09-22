@@ -5,8 +5,9 @@ from sqlalchemy.orm import Session
 from common.models.db import get_db
 from common.models.document import Document
 from common.config import settings
-from common.core.openai_client import translate, single_embed, chat_completion
+from common.core.openai_client import single_embed, chat_completion
 from common.core.openweather import get_weather
+from common.core.googletrans import translate as google_translate
 
 router = APIRouter()
 
@@ -40,7 +41,7 @@ async def ask_question(request: AskRequest, db: Session = Depends(get_db)):
      
     english_question = request.question
     if request.lang != "en":
-        english_question = await translate(request.question, "en")
+        english_question = await google_translate(request.question, src_lang=request.lang, dest_lang="en")
 
 
     # Embed the question
@@ -89,8 +90,6 @@ async def ask_question(request: AskRequest, db: Session = Depends(get_db)):
         
         "If the user greets you (e.g., 'Hi', 'Hello', 'Good morning'), respond in a friendly, human-like manner, such as:\n"
         "'Hello! How can I assist you with your farming needs today?' or 'Hi there! How can I help with your agricultural questions?'"
-
-        f"Answer must be in {lang_map[request.lang]} language only. Don't include any other language.\n\n"
         
         # Add a response for identifying the assistant
         "If asked 'Who am I talking to?' or something similar, you should respond with: 'You are talking to Nile Care AI Farm Advisory, "
