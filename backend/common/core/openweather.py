@@ -26,7 +26,7 @@ async def get_weather(city: str = None, units: str = "metric", lang: str = "en",
         response = await client.get(BASE_URL, params=params)
         response.raise_for_status()  # raises error if not 200
         data = response.json()
-        print(generate_weather_paragraph(data))
+        # print(generate_weather_paragraph(data))
         return data
 
 
