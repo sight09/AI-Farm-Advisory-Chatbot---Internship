@@ -22,12 +22,22 @@ async def get_weather(city: str = None, units: str = "metric", lang: str = "en",
         params["lon"] = lon
     
 
-    async with httpx.AsyncClient(timeout=10.0) as client:
-        response = await client.get(BASE_URL, params=params)
-        response.raise_for_status()  # raises error if not 200
-        data = response.json()
-        # print(generate_weather_paragraph(data))
-        return data
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(BASE_URL, params=params)
+            response.raise_for_status()  # raises error if not 200
+            data = response.json()
+            # print(generate_weather_paragraph(data))
+            return data
+    except httpx.HTTPStatusError as http_err:
+        print(f"HTTP error occurred: {http_err}")
+        return None
+    except httpx.RequestError as req_err:
+        print(f"Request error occurred: {req_err}")
+        return None
+    except Exception as err:
+        print(f"Other error occurred: {err}")
+        return None
 
 
 def generate_weather_paragraph(weather_data):
