@@ -23,7 +23,6 @@ class AskResponse(BaseModel):
     sources: list
     
 lang_map = {
-    "auto": "English",
     "en": "English",
     "am": "Amharic",
     "om": "Affan Oromo",
