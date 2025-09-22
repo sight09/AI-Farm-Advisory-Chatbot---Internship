@@ -7,8 +7,7 @@ from common.models.user import User
 
 buttons = [
     ["Get weather forecast"],
-    ["Change Language", "Set location"],
-    ["Cancel"]
+    ["Change Language", "Set location"]
 ]
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
