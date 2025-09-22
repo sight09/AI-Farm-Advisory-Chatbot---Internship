@@ -1,7 +1,13 @@
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup
-from telegram.ext import ContextTypes
+from telegram.ext import ContextTypes, ConversationHandler
 import httpx
 
+
+buttons = [
+    ["Get weather forecast"],
+    ["Change Language", "Set location"],
+    ["Cancel"]
+]
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Send a message when the command /start is issued."""
@@ -11,10 +17,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # keyboard = [[button]]
     # reply_markup = ReplyKeyboardMarkup(keyboard, one_time_keyboard=True)
     
+    reply_markup = ReplyKeyboardMarkup(buttons, one_time_keyboard=True, resize_keyboard=True)
+    
+    
     user = update.effective_user
     return await update.message.reply_html(
-        rf"Hi {user.mention_html()}! Welcome to the AI Farm Advisory Chatbot. How can I assist you today?"
+        rf"Hi {user.mention_html()}! Welcome to the AI Farm Advisory Chatbot. How can I assist you today?",
+        reply_markup=reply_markup
     )
+
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Echo the user message."""
@@ -35,7 +46,4 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             answer = "Sorry, there was an error processing your request."
     
-    await update.message.reply_text(answer)
-    
-    # print(f"Received message: {user_message}")
-    # await update.message.reply_text(f"You said: {user_message}")
+    return await update.message.reply_text(answer)
