@@ -1,6 +1,8 @@
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes, ConversationHandler
 import httpx
+from common.models.db import get_db
+from common.models.user import User
 
 
 buttons = [
@@ -17,10 +19,21 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # keyboard = [[button]]
     # reply_markup = ReplyKeyboardMarkup(keyboard, one_time_keyboard=True)
     
+    user = update.effective_user
+    
+    user_id = user.id
+    with next(get_db()) as db:
+        existing_user = db.query(User).filter_by(telegram_id=str(user_id)).first()
+        if not existing_user:
+            new_user = User(telegram_id=str(user_id), language="en")
+            db.add(new_user)
+            db.commit()
+            print(f"New user added: {user_id}")
+        else:
+            print(f"Existing user: {user_id}")
+    
     reply_markup = ReplyKeyboardMarkup(buttons, one_time_keyboard=True, resize_keyboard=True)
     
-    
-    user = update.effective_user
     return await update.message.reply_html(
         rf"Hi {user.mention_html()}! Welcome to the AI Farm Advisory Chatbot. How can I assist you today?",
         reply_markup=reply_markup
