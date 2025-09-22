@@ -41,21 +41,34 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Echo the user message."""
+    user_id = update.effective_user.id
+    user = None
+    with next(get_db()) as db:
+        user = db.query(User).filter_by(telegram_id=str(user_id)).first()
+        if not user:
+            return await update.message.reply_text("Please start the bot with /start command.")
+
     user_message = update.message.text
     
-    latitude = update.message.location.latitude if update.message.location else None
-    longitude = update.message.location.longitude if update.message.location else None
-    print(f"Received location: lat={latitude}, lon={longitude}")
+    # latitude = update.message.location.latitude if update.message.location else None
+    # longitude = update.message.location.longitude if update.message.location else None
+    # print(f"Received location: lat={latitude}, lon={longitude}")
     
+    lang = user.language if user and user.language else "en"
+    location = user.location if user and user.location else "Addis Ababa"
+
+    print(f"User ({user_id}) message: {user_message}, lang: {lang}, location: {location}")
+
     # interact with /ask endpoint
     async with httpx.AsyncClient(timeout=None) as client:
         response = await client.post(
             "http://localhost:8000/ask",
-            json={"question": user_message, "lang": "en"}
+            json={"question": user_message, "lang": lang, "location": location}
         )
         if response.status_code == 200:
             answer = response.json().get("answer", "Sorry, I couldn't find an answer.")
         else:
+            print(f"Error from /ask endpoint: {response.status_code}, {response.text}")
             answer = "Sorry, there was an error processing your request."
     
     return await update.message.reply_text(answer)
