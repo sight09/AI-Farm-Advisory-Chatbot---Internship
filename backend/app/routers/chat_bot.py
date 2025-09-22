@@ -7,13 +7,13 @@ from common.models.document import Document
 from common.config import settings
 from common.core.openai_client import single_embed, chat_completion
 from common.core.openweather import get_weather
-from common.core.googletrans import translate as google_translate
+from common.core.googletrans import translate as google_translate, detect_language
 
 router = APIRouter()
 
 class AskRequest(BaseModel):
     question: str = Field(..., min_length=2, max_length=200, example="What is the best fertilizer for tomatoes?")
-    lang: str = Field("auto", pattern="^(auto|en|am|om|so)$")  # optional
+    lang: str = Field("en", pattern="^(auto|en|am|om|so|ti)$")  # optional
     location: Optional[str] = Field("", example="Addis Ababa")  # optional
     latitude: Optional[float] = Field(None, example=9.03)  # optional
     longitude: Optional[float] = Field(None, example=38.74)  # optional
@@ -31,6 +31,16 @@ lang_map = {
     "ti": "Tigrinya"
 }
 
+def clean_text(text: str) -> str:
+    """
+    Optionally, remove unwanted characters like stars (for bolding)
+    """
+    text = text.replace("**", "")
+    text = text.replace(">>>>", "")
+    # Add more cleaning logic as needed
+    return text
+
+
 @router.post("/ask", response_model=AskResponse)
 async def ask_question(request: AskRequest, db: Session = Depends(get_db)):
     """
@@ -40,13 +50,14 @@ async def ask_question(request: AskRequest, db: Session = Depends(get_db)):
     """
      
     english_question = request.question
-    if request.lang != "en":
+    question_lang = await detect_language(english_question)
+    
+    if question_lang != "en":
         english_question = await google_translate(request.question, src_lang=request.lang, dest_lang="en")
 
 
     # Embed the question
     query_embedding = await single_embed(english_question)
-        
     
     # Retrieve relevant chunks from the database
     result = db.query(Document).order_by(Document.embedding.cosine_distance(query_embedding)).limit(settings.k_retrieval).all()
@@ -66,13 +77,6 @@ async def ask_question(request: AskRequest, db: Session = Depends(get_db)):
         context += f"\n\nWeather information for coordinates ({request.latitude}, {request.longitude}):\n{weather_data}"
 
     # Build prompt for answering
-    # system = (
-    #     "You are an agricultural assistant. Use ONLY the provided context to answer the question in clear simple English. "
-    #     "If answer not in context, be honest and say you don't know."
-    #     "If the user ask for the weather, provide a concise weather report using the provided data, without any additional commentary."
-    #     f"Answer must be in {lang_map[request.lang]} language only don't include any other language."
-    # )
-    
     system_prompt = (
         "You are Nile Care AI Farm Advisory, a specialized agricultural assistant. Your role is to provide concise, clear, "
         "and informative answers based solely on the context provided. Always answer in the language requested, without "
@@ -94,12 +98,14 @@ async def ask_question(request: AskRequest, db: Session = Depends(get_db)):
         # Add a response for identifying the assistant
         "If asked 'Who am I talking to?' or something similar, you should respond with: 'You are talking to Nile Care AI Farm Advisory, "
         "your trusted agricultural assistant designed to help with farming-related queries and provide tailored guidance based on provided data.'"
+        
+        "Don't include any list just return the answer in a paragraph format."
     )
     
     prompt = f"""Use the following context to answer the
 
     question: {english_question}
-    user language: {lang_map[request.lang]}
+    user language: {lang_map[request.lang]} just to be clear use english for the answer whatever the user language is.
 
     Context:
     {context}
@@ -108,11 +114,16 @@ async def ask_question(request: AskRequest, db: Session = Depends(get_db)):
     """
 
     answer = await chat_completion(system_prompt, [{"role":"user","content":prompt}], max_tokens=512)
-
-    # print("Question:", request.question)
+    
+    answer = clean_text(answer)
+    
+    if request.lang != "en":
+        answer = await google_translate(answer, src_lang="en", dest_lang=request.lang)
+    
+    # print("Question:", english_question)
     # print("Context:", context)
     # print("Weather info:", weather_data)
-    # print("Answer:", answer)
+    # print("Answer:", answer)    
 
     sources = ["source1", "source2"]
     return AskResponse(answer=answer, sources=sources)
