@@ -16,5 +16,13 @@ class Settings(BaseSettings):
         env_file=".env",
         extra="ignore"
     )
+    supported_languages: dict = {
+        "auto": "English",
+        "en": "English",
+        "am": "Amharic",
+        "om": "Affan Oromo",
+        "so": "Somali",
+        "ti": "Tigrinya"
+    }
 
 settings = Settings()
