@@ -46,11 +46,3 @@ async def chat_completion(system_prompt: str, messages: list[dict], max_tokens=5
 
     return await asyncio.to_thread(_call)
 
-
-async def translate(text: str, target_lang: str):
-    """
-    lightweight translator using the chat model (good for small text)
-    """
-    # Keep translations short; for bulk use a dedicated translator
-    prompt = f"Translate the following text to {target_lang}. Keep meaning and units. Text:\n\n{text}"
-    return await chat_completion("You are a translation assistant.", [{"role":"user","content":prompt}], max_tokens=512)
