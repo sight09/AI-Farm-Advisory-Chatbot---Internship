@@ -33,7 +33,7 @@ It supports **multilingual queries (e.g., Afaan Oromo, English)** and integrates
 ### 1. Clone repository  
 
 ```bash
-$ git clone thub.com/abudi47/AI-Farm-Advisory-Chatbot---Internship.git
+$ git clone https://github.com/abudi47/AI-Farm-Advisory-Chatbot---Internship.git
 $ cd AI-Farm-Advisory-Chatbot---Internship
 ```
 
