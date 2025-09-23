@@ -1,0 +1,8 @@
+# Ignore Python virtual environment
+.venv/
+
+# Ignore other unnecessary files or directories
+*.pyc
+__pycache__/
+*.pyo
+*.pyd

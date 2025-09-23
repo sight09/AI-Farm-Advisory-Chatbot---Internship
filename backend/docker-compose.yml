@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - ENV=development
+      - DATABASE_URL=postgresql+psycopg2://avnadmin:your_password@ai-farm-pg-ai-farm.l.aivencloud.com:22449/defaultdb?sslmode=require
+      - OPENWEATHER_API_KEY=key
+      - OPENAI_API_KEY=key
+    command: python main.py runserver
+
+  bot:
+    build: .
+    volumes:
+      - .:/app
+    environment:
+      - ENV=development
+      - TELEGRAM_BOT_TOKEN=key
+    command: python main.py runbot
