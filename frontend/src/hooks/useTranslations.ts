@@ -167,7 +167,7 @@ const translations: Record<string, Translations> = {
     home: "ገዝ",
     language: "ቋንቋ",
   },
-  or: {
+  om: {
     title: "Nile Care AI Gorsaa Qonnaa",
     subtitle: "Gorsituu qonnaa hubannoo qabu keessan",
     heroTitle: "Qonnaa keessan jijjiiruu",
