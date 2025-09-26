@@ -160,3 +160,30 @@ We welcome bug reports, feature requests, documentation updates, and code improv
    Go to the original repository and click the **Compare & pull request** button.  
    Fill out the PR template and describe your changes.
 
+
+## Contributors
+<!-- Contributors list -->
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/beab1212">
+        <img src="https://avatars.githubusercontent.com/u/111971678?v=4" width="100px;" alt="User1"/>
+      </a>
+      <br />
+      <a href="https://github.com/beab1212">Beab1212</a>
+      <br />
+      <a href="https://x.com/bw40508">Twitter</a> | <a href="https://linkedin.com/in/beabdev">LinkedIn</a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/abudi47">
+        <img src="https://avatars.githubusercontent.com/u/136098639?v=4" width="100px;" alt="User2"/>
+      </a>
+      <br />
+      <a href="https://github.com/abudi47">Abudi47</a>
+      <br />
+      <a href="https://twitter.com//abduselam-t">Twitter</a> | <a href="https://linkedin.com/in/abduselam-t">LinkedIn</a>
+    </td>
+    <!-- Repeat for more contributors -->
+  </tr>
+</table>
+
