@@ -30,7 +30,7 @@ export function ChatInput({
         (window as any).SpeechRecognition ||
         (window as any).webkitSpeechRecognition;
       const recognition = new SpeechRecognitionClass() as SpeechRecognition;
-
+      
       recognition.continuous = false;
       recognition.interimResults = false;
       recognition.lang = "en-US";
