@@ -10,6 +10,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+@app.get("/")
+def read_root():
+    return {"status": "ok", "message": "FastAPI backend is running on Render 🚀"}
 
 app.include_router(chat_bot_router)
 # app.include_router(item.router)
