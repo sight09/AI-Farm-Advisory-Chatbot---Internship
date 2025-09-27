@@ -52,7 +52,7 @@ def cli():
 @cli.command(help="Run the backend server.")
 def runserver():
     import uvicorn
-    uvicorn.run("app.main:app", host="localhost", port=8000, reload=True)
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
 
 @cli.command(help="Run embed and store")
 @click.argument("file_path", type=click.Path(exists=True))
