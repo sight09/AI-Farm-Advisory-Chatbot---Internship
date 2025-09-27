@@ -3,6 +3,7 @@ import sys
 import asyncio
 from common.models.db import SessionLocal
 from common.models import init_db
+from common.logger_utils import logger
 
 
 # If no arguments are provided, exit gracefully
@@ -19,7 +20,9 @@ def cli():
 @cli.command(help="Run the backend server.")
 def runserver():
     import uvicorn
+    logger.info("Starting the backend server...")
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+    logger.info("Backend server stopped.")
 
 @cli.command(help="Run embed and store")
 @click.argument("file_path", type=click.Path(exists=True))
@@ -40,6 +43,7 @@ def embed_and_store_cmd(file_path, title):
 @cli.command(help="Run the Telegram bot.")
 def runbot():
     from services.bot.handlers.bot import init_bot
+    logger.info("Starting the Telegram bot...")
     init_bot()
 
     
