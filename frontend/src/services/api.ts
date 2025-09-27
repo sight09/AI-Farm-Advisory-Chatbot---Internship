@@ -1,5 +1,7 @@
-const API_BASE_URL = "http://localhost:8000";
-
+// const API_BASE_URL = "http://localhost:8000";
+// filepath: frontend/src/services/api.ts
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+console.log(API_BASE_URL)
 export interface ChatMessage {
   id: string;
   text: string;
@@ -42,7 +44,13 @@ export async function sendMessage(
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ question, lang, location: location, latitude: latitude, longitude: longitude }),
+      body: JSON.stringify({
+        question,
+        lang,
+        location: location,
+        latitude: latitude,
+        longitude: longitude,
+      }),
     });
 
     if (!response.ok) {
