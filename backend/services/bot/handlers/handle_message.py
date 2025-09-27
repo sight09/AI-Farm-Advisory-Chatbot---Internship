@@ -59,6 +59,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     print(f"User ({user_id}) message: {user_message}, lang: {lang}, location: {location}")
 
+    await update.message.chat.send_action(action="typing")
+
     # interact with /ask endpoint
     async with httpx.AsyncClient(timeout=None) as client:
         response = await client.post(
