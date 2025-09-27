@@ -35,17 +35,19 @@ const Landing = () => {
                   style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}
                 />
               </div>
-              <div>
-                <h1 className="text-2xl font-bold">{t.title}</h1>
-                <p className="text-sm opacity-90">{t.subtitle}</p>
+              <div className="max-w-[180px] sm:max-w-none overflow-hidden">
+                <h1 className="text-2xl font-bold text-nowrap">{t.title}</h1>
+                <p className="text-sm opacity-90 text-nowrap">{t.subtitle}</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
               <Select value={currentLanguage} onValueChange={changeLanguage}>
-                <SelectTrigger className="w-[180px] bg-white/10 border-white/20 text-white">
+                <SelectTrigger className="w-[50px] sm:w-[180px] bg-white/10 border-white/20 text-white">
                   <div className="flex items-center space-x-2">
                     <Languages className="h-4 w-4" />
-                    <SelectValue />
+                    <div className="hidden sm:block">
+                      <SelectValue />
+                    </div>
                   </div>
                 </SelectTrigger>
                 <SelectContent>
